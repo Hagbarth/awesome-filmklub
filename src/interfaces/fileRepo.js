@@ -13,8 +13,14 @@ export default function({ fbHandler }) {
     subscribeDirectories: function(cb) {
       fbHandler.db.ref('directories').on('value', r => {
         const tmpDirs = r.val();
-        const dirs = Object.keys(tmpDirs)
-          .map(key => ({ id: key, ...tmpDirs[key] }));
+        const dirs = Object.keys(tmpDirs).map(key => ({
+          ...tmpDirs[key],
+          id: key,
+          files: Object.keys(tmpDirs[key].files).map(fileKey => ({
+            ...tmpDirs[key].files[fileKey],
+            id: fileKey
+          }))
+        }));
 
         return cb(dirs);
       });

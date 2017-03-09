@@ -22,6 +22,22 @@ describe('<Files />', () => {
     expect(wrapper.find(NavItem)).toHaveLength(1);
   });
 
+  it('renders the files in current dir in the table', () => {
+    const dir = {
+      id: 'some-id',
+      name: 'some-name',
+      files: [
+        {
+          key: 'some-key'
+        }
+      ]
+    };
+    const wrapper = shallow(<Files directories={[dir]} />);
+    wrapper.setState({ currentDir: dir });
+    expect(wrapper.find('td')).toHaveLength(1);
+    expect(wrapper.find('td').text()).toBe('some-key');
+  });
+
   it('calls subscribeDirectories on mount', () => {
     const mockSub = jest.fn();
     const wrapper = mount(
@@ -43,7 +59,10 @@ describe('<Files />', () => {
       />
     );
     wrapper.find(NavItem).simulate('click');
-    expect(wrapper.state().currentDir).toBe('some-id');
+    expect(wrapper.state().currentDir).toEqual({
+      id: 'some-id',
+      name: 'some-name'
+    });
   });
 
   it(

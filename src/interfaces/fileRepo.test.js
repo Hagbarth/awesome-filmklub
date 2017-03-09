@@ -106,11 +106,12 @@ describe('fileRepo', () => {
         expect(dirs).toEqual([
           {
             id: 'somekey',
-            files: {
-              somekey: {
+            files: [
+              {
+                id: 'somekey',
                 key: 'foo'
               }
-            }
+            ]
           }
         ]);
         done();

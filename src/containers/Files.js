@@ -20,7 +20,7 @@ export default class Files extends Component {
   }
 
   _setDir = key => this.setState({
-    currentDir: key
+    currentDir: this.props.directories.filter(dir => dir.id === key)[0]
   });
 
   _addDir = name => this.props.fileActions.addDirectory(name);
@@ -44,10 +44,28 @@ export default class Files extends Component {
                   id={dir.id}
                   text={dir.name}
                   onClick={this._setDir}
-                  active={this.state.currentDir === dir.id}
+                  active={
+                    this.state.currentDir && this.state.currentDir.id === dir.id
+                  }
                 />
               ))}
             </Nav>
+          </div>
+          <div className="col-md-9">
+            <table className="table table-striped">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                {this.state.currentDir &&
+                  this.state.currentDir.files &&
+                  this.state.currentDir.files.map(file => (
+                    <tr key={file.key}><td>{file.key}</td></tr>
+                  ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
