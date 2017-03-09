@@ -16,10 +16,14 @@ export default function({ fbHandler }) {
         const dirs = Object.keys(tmpDirs).map(key => ({
           ...tmpDirs[key],
           id: key,
-          files: Object.keys(tmpDirs[key].files).map(fileKey => ({
-            ...tmpDirs[key].files[fileKey],
-            id: fileKey
-          }))
+          files: (
+            tmpDirs[key].files
+              ? Object.keys(tmpDirs[key].files).map(fileKey => ({
+                  ...tmpDirs[key].files[fileKey],
+                  id: fileKey
+                }))
+              : []
+          )
         }));
 
         return cb(dirs);

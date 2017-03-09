@@ -118,5 +118,31 @@ describe('fileRepo', () => {
       });
       expect(mockRef).toHaveBeenCalledWith('directories');
     });
+
+    it('doesn not fail when a dir does not have any files', done => {
+      const mockRef = jest.fn(() => ({
+        on: jest.fn((val, cb) => {
+          const dirs = {
+            val: () => ({
+              somekey: {}
+            })
+          };
+          cb(dirs);
+        })
+      }));
+
+      fileRepo({
+        fbHandler: { db: { ref: mockRef } }
+      }).subscribeDirectories(dirs => {
+        expect(dirs).toEqual([
+          {
+            id: 'somekey',
+            files: []
+          }
+        ]);
+        done();
+      });
+      expect(mockRef).toHaveBeenCalledWith('directories');
+    });
   });
 });
