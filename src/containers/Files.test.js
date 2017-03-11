@@ -2,6 +2,7 @@ import React from 'react';
 import { shallow, mount } from 'enzyme';
 import Files from './Files';
 import NavItem from '../components/NavItem';
+import ProgressRow from '../components/ProgressRow';
 
 describe('<Files />', () => {
   it('renders', () => {
@@ -28,14 +29,25 @@ describe('<Files />', () => {
       name: 'some-name',
       files: [
         {
+          id: 'some-key',
           key: 'some-key'
         }
       ]
     };
-    const wrapper = shallow(<Files directories={[dir]} />);
-    wrapper.setState({ currentDir: dir });
+    let wrapper = shallow(<Files directories={[dir]} uploads={[]} />);
+    wrapper.setState({ currentDir: dir.id });
     expect(wrapper.find('td')).toHaveLength(1);
     expect(wrapper.find('td').text()).toBe('some-key');
+    expect(wrapper.find(ProgressRow).prop('progress')).toBeFalsy();
+
+    wrapper = shallow(
+      <Files
+        directories={[dir]}
+        uploads={[{ key: 'some-key', progress: 10 }]}
+      />
+    );
+    wrapper.setState({ currentDir: dir.id });
+    expect(wrapper.find(ProgressRow).prop('progress')).toBe(10);
   });
 
   it('calls subscribeDirectories on mount', () => {
@@ -59,10 +71,7 @@ describe('<Files />', () => {
       />
     );
     wrapper.find(NavItem).simulate('click');
-    expect(wrapper.state().currentDir).toEqual({
-      id: 'some-id',
-      name: 'some-name'
-    });
+    expect(wrapper.state().currentDir).toEqual('some-id');
   });
 
   it(
@@ -74,6 +83,19 @@ describe('<Files />', () => {
       );
       wrapper.instance()._addDir('some-name');
       expect(mockAddDir).toHaveBeenCalledWith('some-name');
+    }
+  );
+
+  it(
+    'calls props.fileActions.uploadFiles with files when onDrop is called',
+    () => {
+      const upload = jest.fn();
+      const wrapper = shallow(
+        <Files directories={[]} fileActions={{ uploadFiles: upload }} />
+      );
+      wrapper.setState({ currentDir: 'some-dir' });
+      wrapper.instance()._onDrop(['file']);
+      expect(upload).toHaveBeenCalledWith('some-dir', ['file']);
     }
   );
 });

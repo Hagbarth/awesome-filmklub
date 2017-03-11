@@ -3,6 +3,7 @@ import Dropzone from 'react-dropzone';
 import Nav from '../components/Nav';
 import NavItem from '../components/NavItem';
 import InputButton from '../components/InputButton';
+import ProgressRow from '../components/ProgressRow';
 
 export default class Files extends Component {
   constructor(props) {
@@ -13,7 +14,8 @@ export default class Files extends Component {
   }
 
   static propTypes = {
-    directories: PropTypes.array.isRequired
+    directories: PropTypes.array.isRequired,
+    uploads: PropTypes.array.isRequired
   };
 
   componentDidMount() {
@@ -68,9 +70,19 @@ export default class Files extends Component {
               <tbody>
                 {currentDir &&
                   currentDir.files &&
-                  currentDir.files.map(file => (
-                    <tr key={file.id}><td>{file.key}</td></tr>
-                  ))}
+                  currentDir.files.map(file => {
+                    const uploading = this.props.uploads.filter(
+                      u => u.key === file.id
+                    )[0];
+                    return (
+                      <ProgressRow
+                        progress={uploading ? uploading.progress : undefined}
+                        key={file.id}
+                      >
+                        <td>{file.key}</td>
+                      </ProgressRow>
+                    );
+                  })}
               </tbody>
             </table>
             {this.state.currentDir !== null

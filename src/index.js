@@ -45,7 +45,8 @@ firebase.auth().onAuthStateChanged(function(user) {
               path="files"
               component={connect(
                 state => ({
-                  directories: state.fileReducer
+                  directories: state.fileReducer,
+                  uploads: state.uploadReducer
                 }),
                 dispatch => ({
                   fileActions: bindActionCreators(
