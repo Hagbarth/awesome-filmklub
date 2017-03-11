@@ -21,16 +21,18 @@ export default class Files extends Component {
   }
 
   _setDir = key => this.setState({
-    currentDir: this.props.directories.filter(dir => dir.id === key)[0]
+    currentDir: this.props.directories.filter(dir => dir.id === key)[0].id
   });
 
   _addDir = name => this.props.fileActions.addDirectory(name);
 
   _onDrop = files => {
-    this.props.fileActions.uploadFiles(this.state.currentDir.id, files);
+    this.props.fileActions.uploadFiles(this.state.currentDir, files);
   };
 
   render() {
+    const currentDir = this.state.currentDir &&
+      this.props.directories.filter(dir => dir.id === this.state.currentDir)[0];
     return (
       <div>
         <br />
@@ -50,7 +52,7 @@ export default class Files extends Component {
                   text={dir.name}
                   onClick={this._setDir}
                   active={
-                    this.state.currentDir && this.state.currentDir.id === dir.id
+                    this.state.currentDir && this.state.currentDir === dir.id
                   }
                 />
               ))}
@@ -64,9 +66,9 @@ export default class Files extends Component {
                 </tr>
               </thead>
               <tbody>
-                {this.state.currentDir &&
-                  this.state.currentDir.files &&
-                  this.state.currentDir.files.map(file => (
+                {currentDir &&
+                  currentDir.files &&
+                  currentDir.files.map(file => (
                     <tr key={file.id}><td>{file.key}</td></tr>
                   ))}
               </tbody>
