@@ -5,10 +5,14 @@ export default function({ fbHandler }) {
       const newDir = ref.push();
       newDir.set({ name, createdAt: new Date().toISOString() });
     },
-    addFile: function({ parentDir, key }) {
+    addFile: function({ parentDir, file, fileIndex = 0 }) {
       const ref = fbHandler.db.ref(`directories/${parentDir}/files`);
       const newFile = ref.push();
-      newFile.set({ key, createdAt: new Date().toISOString() });
+      newFile.set({ key: file.name, createdAt: new Date().toISOString() });
+      const storageRef = fbHandler.storage.ref();
+      return storageRef
+        .child(`${parentDir}/${file.name}`)
+        .put(file, { fileIndex, key: newFile.key });
     },
     subscribeDirectories: function(cb) {
       fbHandler.db.ref('directories').on('value', r => {

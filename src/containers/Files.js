@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import Dropzone from 'react-dropzone';
 import Nav from '../components/Nav';
 import NavItem from '../components/NavItem';
 import InputButton from '../components/InputButton';
@@ -24,6 +25,10 @@ export default class Files extends Component {
   });
 
   _addDir = name => this.props.fileActions.addDirectory(name);
+
+  _onDrop = files => {
+    this.props.fileActions.uploadFiles(this.state.currentDir.id, files);
+  };
 
   render() {
     return (
@@ -62,10 +67,29 @@ export default class Files extends Component {
                 {this.state.currentDir &&
                   this.state.currentDir.files &&
                   this.state.currentDir.files.map(file => (
-                    <tr key={file.key}><td>{file.key}</td></tr>
+                    <tr key={file.id}><td>{file.key}</td></tr>
                   ))}
               </tbody>
             </table>
+            {this.state.currentDir !== null
+              ? <Dropzone
+                  disableClick
+                  onDrop={this._onDrop}
+                  style={{
+                    width: '100%',
+                    border: '1px dashed black',
+                    borderRadius: '3px',
+                    padding: '10px'
+                  }}
+                  activeStyle={{}}
+                >
+                  {({ isDragActive }) => (
+                    <div>
+                      {isDragActive ? 'Slip' : 'Træk filer ind her.'}
+                    </div>
+                  )}
+                </Dropzone>
+              : null}
           </div>
         </div>
       </div>

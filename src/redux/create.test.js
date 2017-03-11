@@ -6,7 +6,8 @@ import reducers from './reducers';
 jest.mock('redux', () => {
   return {
     createStore: jest.fn(() => 'returned from create store'),
-    applyMiddleware: jest.fn(c => c)
+    applyMiddleware: jest.fn(c => c),
+    compose: jest.fn(c => c)
   };
 });
 

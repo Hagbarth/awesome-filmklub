@@ -1,19 +1,28 @@
 import { fileRepo } from './';
 
 function getMocks() {
-  const mockSet = jest.fn();
+  const mockSet = jest.fn(() => Promise.resolve());
   const mockPush = jest.fn(() => ({ set: mockSet }));
   const mockRef = jest.fn(() => ({ push: mockPush }));
+  const mockPut = jest.fn();
+  const mockChild = jest.fn(() => ({ put: mockPut }));
+  const mockStorageRef = jest.fn(() => ({ child: mockChild }));
   const mockFbHandler = {
     db: {
       ref: mockRef
+    },
+    storage: {
+      ref: mockStorageRef
     }
   };
   return {
     mockSet,
     mockPush,
     mockRef,
-    mockFbHandler
+    mockFbHandler,
+    mockPut,
+    mockChild,
+    mockStorageRef
   };
 }
 
@@ -49,14 +58,22 @@ describe('fileRepo', () => {
     it('calls fbHandler.db.ref with "directories/parentDir/files"', () => {
       const mocks = getMocks();
       fileRepo({ fbHandler: mocks.mockFbHandler }).addFile({
-        parentDir: 'parentDir'
+        parentDir: 'parentDir',
+        file: {
+          name: 'filename'
+        }
       });
       expect(mocks.mockRef).toHaveBeenCalledWith('directories/parentDir/files');
     });
 
     it('calls ref.push', () => {
       const mocks = getMocks();
-      fileRepo({ fbHandler: mocks.mockFbHandler }).addFile({});
+      fileRepo({ fbHandler: mocks.mockFbHandler }).addFile({
+        parentDir: 'parentDir',
+        file: {
+          name: 'some-key'
+        }
+      });
       expect(mocks.mockPush).toHaveBeenCalled();
     });
 
@@ -64,10 +81,71 @@ describe('fileRepo', () => {
       const mocks = getMocks();
       fileRepo({ fbHandler: mocks.mockFbHandler }).addFile({
         parentDir: 'parentDir',
-        key: 'some-key'
+        file: {
+          name: 'some-key'
+        }
       });
       expect(mocks.mockSet.mock.calls[0][0].key).toBe('some-key');
       expect(mocks.mockSet.mock.calls[0][0].createdAt).toBeTruthy();
+    });
+
+    it('gets a storage ref', () => {
+      const mocks = getMocks();
+      fileRepo({ fbHandler: mocks.mockFbHandler }).addFile({
+        parentDir: 'parentDir',
+        file: {
+          name: 'some-key'
+        }
+      });
+      expect(mocks.mockStorageRef).toHaveBeenCalled();
+    });
+
+    it('calls child on the storage ref', () => {
+      const mocks = getMocks();
+      fileRepo({ fbHandler: mocks.mockFbHandler }).addFile({
+        parentDir: 'parentDir',
+        file: {
+          name: 'some-key'
+        }
+      });
+      expect(mocks.mockChild).toHaveBeenCalledWith('parentDir/some-key');
+    });
+
+    it('calls put on child', () => {
+      const mocks = getMocks();
+      const mockPush = jest.fn(() => ({ set: mocks.mockSet, key: 'some-key' }));
+      mocks.mockFbHandler.db.ref = jest.fn(() => ({ push: mockPush }));
+      fileRepo({ fbHandler: mocks.mockFbHandler }).addFile({
+        parentDir: 'parentDir',
+        file: {
+          name: 'some-key'
+        }
+      });
+      expect(mocks.mockPut).toHaveBeenCalledWith(
+        {
+          name: 'some-key'
+        },
+        {
+          fileIndex: 0,
+          key: 'some-key'
+        }
+      );
+      fileRepo({ fbHandler: mocks.mockFbHandler }).addFile({
+        parentDir: 'parentDir',
+        file: {
+          name: 'some-key'
+        },
+        fileIndex: 100
+      });
+      expect(mocks.mockPut).toHaveBeenCalledWith(
+        {
+          name: 'some-key'
+        },
+        {
+          fileIndex: 100,
+          key: 'some-key'
+        }
+      );
     });
   });
 
