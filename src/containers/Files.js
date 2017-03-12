@@ -1,5 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import Dropzone from 'react-dropzone';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+
 import Nav from '../components/Nav';
 import NavItem from '../components/NavItem';
 import InputButton from '../components/InputButton';
@@ -110,3 +113,10 @@ export default class Files extends Component {
     );
   }
 }
+
+export const connectFiles = ({ fileActions }) => connect(state => ({
+  directories: state.fileReducer,
+  uploads: state.uploadReducer
+}), dispatch => ({
+  fileActions: bindActionCreators(fileActions, dispatch)
+}))(Files);

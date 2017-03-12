@@ -1,3 +1,4 @@
 import firebase from './firebase';
+import omdb from './omdb';
 
-export { firebase };
+export { firebase, omdb };

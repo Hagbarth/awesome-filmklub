@@ -1,20 +1,21 @@
+import 'firebaseui/dist/firebaseui.css';
+import './index.css';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Router, Route, browserHistory } from 'react-router';
 import { configureStore } from './redux/create';
-import { Provider, connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+import { Provider } from 'react-redux';
+import firebaseui from 'firebaseui';
+import * as firebase from 'firebase';
+
 import * as infrastructure from './infrastructure/';
 import * as interfaces from './interfaces/';
-import * as firebase from 'firebase';
-import fileActions from './redux/actions/fileActions';
-import firebaseui from 'firebaseui';
-import 'firebaseui/dist/firebaseui.css';
-import './index.css';
+import * as actions from './redux/actions/';
 
 import App from './App';
-import Files from './containers/Files';
-import Movies from './containers/Movies';
+import { connectFiles } from './containers/Files';
+import { connectMovies } from './containers/Movies';
 import Parties from './containers/Parties';
 import Tuesdays from './containers/Tuesdays';
 
@@ -31,9 +32,15 @@ const ui = new firebaseui.auth.AuthUI(firebase.auth());
 
 // Setup infrastructure
 const fbHandler = infrastructure.firebase(fb);
+const omdb = infrastructure.omdb('http://www.omdbapi.com/');
 
 // Setup interfaces
 const fileRepo = interfaces.fileRepo({ fbHandler });
+const movieGetter = interfaces.movieGetter({ omdb });
+
+// Setup actions
+const fileActions = actions.fileActions({ fileRepo });
+const movieActions = actions.movieActions({ movieGetter });
 
 firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
@@ -41,22 +48,8 @@ firebase.auth().onAuthStateChanged(function(user) {
       <Provider store={store}>
         <Router history={browserHistory}>
           <Route path="/" component={App}>
-            <Route
-              path="files"
-              component={connect(
-                state => ({
-                  directories: state.fileReducer,
-                  uploads: state.uploadReducer
-                }),
-                dispatch => ({
-                  fileActions: bindActionCreators(
-                    fileActions({ fileRepo }),
-                    dispatch
-                  )
-                })
-              )(Files)}
-            />
-            <Route path="movies" component={Movies} />
+            <Route path="files" component={connectFiles({ fileActions })} />
+            <Route path="movies" component={connectMovies({ movieActions })} />
             <Route path="parties" component={Parties} />
             <Route path="tuesdays" component={Tuesdays} />
           </Route>
