@@ -4,6 +4,6 @@ import Movies from './Movies';
 
 describe('<Movies />', () => {
   it('renders', () => {
-    shallow(<Movies />);
+    shallow(<Movies movieActions={{ clearSearch: jest.fn() }} />);
   });
 });

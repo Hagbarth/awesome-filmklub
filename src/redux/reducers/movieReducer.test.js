@@ -23,4 +23,14 @@ describe('redux/reducers/movieReducer', () => {
       ).toEqual({ searchResults: ['some-movie'] });
     });
   });
+
+  describe('given the action @@OMDB/clear', () => {
+    it('returns a state with search results cleared', () => {
+      expect(
+        movieReducer({ searchResults: ['some-movie'] }, {
+          type: '@@OMDB/clear'
+        })
+      ).toEqual({ searchResults: [] });
+    });
+  });
 });

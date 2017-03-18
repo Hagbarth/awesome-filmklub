@@ -32,7 +32,7 @@ const ui = new firebaseui.auth.AuthUI(firebase.auth());
 
 // Setup infrastructure
 const fbHandler = infrastructure.firebase(fb);
-const omdb = infrastructure.omdb('http://www.omdbapi.com/');
+const omdb = infrastructure.omdb({ host: 'http://www.omdbapi.com/', fetch });
 
 // Setup interfaces
 const fileRepo = interfaces.fileRepo({ fbHandler });

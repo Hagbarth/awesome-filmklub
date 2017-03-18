@@ -19,4 +19,13 @@ describe('redux/actions/movieActions', () => {
       movieActions({ movieGetter }).search('')(mockDispatch);
     });
   });
+
+  describe('clearSearch', () => {
+    it('dispatches action that clears the search', () => {
+      const movieGetter = {};
+      expect(movieActions({ movieGetter }).clearSearch()).toEqual({
+        type: '@@OMDB/clear'
+      });
+    });
+  });
 });

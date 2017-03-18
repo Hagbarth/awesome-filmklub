@@ -2,6 +2,17 @@ import movieGetter from './movieGetter';
 
 describe('movieGetter', () => {
   describe('search', () => {
+    it('returns an empty array if result is false', done => {
+      const mockOmdb = {
+        get: jest.fn(() => Promise.resolve({
+          Response: 'False'
+        }))
+      };
+      movieGetter({ omdb: mockOmdb }).search('').then(r => {
+        expect(r).toEqual([]);
+        done();
+      });
+    });
     it('returns an array of movies', done => {
       const mockOmdb = {
         get: jest.fn(() => Promise.resolve({
@@ -24,7 +35,6 @@ describe('movieGetter', () => {
         }))
       };
       movieGetter({ omdb: mockOmdb }).search('').then(r => {
-        done();
         expect(r).toEqual([
           {
             title: 'Star Wars: Episode IV - A New Hope',

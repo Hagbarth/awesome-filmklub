@@ -10,6 +10,9 @@ export default function movieReducer(state = initialState, action) {
         searchResults: action.payload.movies
       };
     }
+    case '@@OMDB/clear': {
+      return { ...state, searchResults: [] };
+    }
     default: {
       return state;
     }
